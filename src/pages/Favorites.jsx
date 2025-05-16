@@ -3,7 +3,7 @@ import '../css/Favorites.css'
 function Favorites() {
     return (
         <div className="favorites">
-            <h1>Favorites</h1>
+            <h2>Favorites</h2>
             <p>No favorites yet</p>
         </div>
     )

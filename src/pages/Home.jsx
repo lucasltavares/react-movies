@@ -1,15 +1,29 @@
 import MovieCard from "../components/MovieCard"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { getPopularMovies, searchMovies } from "../services/api";
 import '../css/Home.css'
 
 function Home() {
     const [searchQuery, setSearchQuery] = useState("");
+    const [movies, setMovies] = useState([]);
+    const[error, setError] = useState(null);
+    const[loading, setLoading] = useState(true);
 
-    const movies = [
-        {id: 1, title: "The Matrix", release_date: 1999, poster: "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"},,
-        {id: 2, title: "The Matrix Reloaded", release_date: 1999, poster: "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"},,
-        {id: 3, title: "The Terminator", release_date: 1985, poster: "https://m.media-amazon.com/images/M/MV5BMTg2NjYyNjYxOV5BMl5BanBnXkFtZTgwNTc3NTYxMjI@._V1_SX300.jpg"},
-    ]
+    useEffect(() => {
+        const loadPopularMovies = async () => {
+            try {
+                const popularMovies = await getPopularMovies();
+                setMovies(popularMovies);
+            } catch (error) {
+                console.error("Failed to load popular movies:", error);
+                setError("Failed to load movies...");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadPopularMovies();
+    }, [])
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -30,11 +44,13 @@ function Home() {
                 <button type="submit" className="search-button">Search</button>
             </form>
 
-            <div className="movie-grid">
+            {error && <p className="error">{error}</p>}
+            {loading ? <div className="loading">Loading...</div> : 
+            <div className="movies-grid">
                 {movies.map((movie) => (
                     movie.title.toLowerCase().includes(searchQuery.toLowerCase()) && <MovieCard key={movie.id} movie={movie} />
                 ))}
-            </div>
+            </div>}
         </div>
     )
 }
